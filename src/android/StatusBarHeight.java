@@ -16,23 +16,25 @@ public class StatusBarHeight extends CordovaPlugin {
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-        // 测试命令
         if (action.equals("echo")) {
             String message = args.getString(0);
             this.echo(message, callbackContext);
             return true;
         }
-        
-        // 获取状态栏高度命令
-        if (action.equals("getValue")) {
-          this.getValue(callbackContext);
+
+        if (action.equals("getStatusBarHeight")) {
+          this.getStatusBarHeight(callbackContext);
+          return true;
+        }
+
+        if (action.equals("getNavigationBarHeight")) {
+          this.getNavigationBarHeight(callbackContext);
           return true;
         }
 
         return false;
     }
 
-    // 测试方法
     private void echo(String message, CallbackContext callbackContext) {
         if (message != null && message.length() > 0) {
             callbackContext.success(message);
@@ -41,19 +43,25 @@ public class StatusBarHeight extends CordovaPlugin {
         }
     }
 
-    // 获取状态栏高度
-    private void getValue(CallbackContext callbackContext) {
+    private void getStatusBarHeight(CallbackContext callbackContext) {
+      this.getResourceDim(callbackContext, "status_bar_height");
+    }
+
+    private void getNavigationBarHeight(CallbackContext callbackContext) {
+      this.getResourceDim(callbackContext, "navigation_bar_height");
+    }
+
+    private void getResourceDim(CallbackContext callbackContext, string resouceName) {
       Context contextApplication = cordova.getActivity().getApplicationContext();
       Resources resources = contextApplication.getResources();
-      int statusBarHeight = -1;
-      //获取status_bar_height资源的ID
-      int resourceId = resources.getIdentifier("status_bar_height", "dimen","android");
+
+      int resourceId = resources.getIdentifier(resouceName, "dimen", "android");
       if (resourceId > 0) {
-        //根据资源ID获取响应的尺寸值
-        statusBarHeight = resources.getDimensionPixelSize(resourceId);
-        callbackContext.success(statusBarHeight); // 成功回调返回状态栏高度值
+        int value = resources.getDimensionPixelSize(resourceId);
+        int result = (int) (value / Resources.getSystem().getDisplayMetrics().density);
+        callbackContext.success(value);
       } else {
-        callbackContext.error("未获取到状态栏高度");
+        callbackContext.error("error");
       }
     }
 }

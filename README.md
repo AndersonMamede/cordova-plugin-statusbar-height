@@ -1,30 +1,37 @@
 # cordova-plugin-statusbar-height
-> 获取Android，iOS状态栏高度
+> Android，iOS
 
 ## Installation
 
 ```bash
-cordova plugin add https://github.com/wangjunget/cordova-plugin-statusbar-height.git
+cordova plugin add https://github.com/toptive/cordova-plugin-statusbar-height.git
 ```
 
 ## Methods
 
-### cordova.plugins.StatusBarHeight.getValue
+### cordova.plugins.StatusBarHeight.getStatusBarHeight
 
+## cordova.plugins.StatusBarHeight.getNavigationBarHeight
 
-
-## cordova.plugins.StatusBarHeight.getValue
-
-### Description
-
-获取状态栏高度值，值类型为设备独立像素值。
 
 ###  Demo
 
 ```javascript
 document.addEventListener('deviceready', getStatusbarHeight, false);
 function getStatusbarHeight() {
-    cordova.plugins.StatusBarHeight.getValue(
+    cordova.plugins.StatusBarHeight.getStatusBarHeight(
+        function(value) {
+            console.log(value);
+        },
+        function(error) {
+            console.log(error);
+        }
+    )
+}
+
+document.addEventListener('deviceready', getStatusbarHeight, false);
+function getStatusbarHeight() {
+    cordova.plugins.StatusBarHeight.getNavigationBarHeight(
         function(value) {
             console.log(value);
         },
@@ -34,19 +41,6 @@ function getStatusbarHeight() {
     )
 }
 ```
-
-
-### Tips
-
-* 该插件获取到的值为设备独立像素值，如需要物理像素值可自行转换
-
-  ```javascript
-  var value; // 插件获取到的独立像素值
-  var pdr = window.devicePixelRatio; // 获取设备独立像素比
-  var px = value * pdr; // 得到物理像素值
-  ```
-
-  
 
 ### Supported Platforms
 

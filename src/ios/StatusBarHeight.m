@@ -7,7 +7,8 @@
 }
 
 - (void)echo:(CDVInvokedUrlCommand*)command;
-- (void)getValue:(CDVInvokedUrlCommand*)command;
+- (void)getStatusBarHeight:(CDVInvokedUrlCommand*)command;
+- (void)getNavigationBarHeight:(CDVInvokedUrlCommand*)command;
 @end
 
 @implementation StatusBarHeight
@@ -26,13 +27,22 @@
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
-- (void)getValue:(CDVInvokedUrlCommand*)command
+- (void)getStatusBarHeight:(CDVInvokedUrlCommand*)command
 {
 	CDVPluginResult* pluginResult = nil;
 	CGRect statusRect = [[UIApplication sharedApplication] statusBarFrame];
 	CGFloat statusBarHeight = statusRect.size.height;
 	pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsInt:statusBarHeight];
-	
+
+	[self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+- (void)getNavigationBarHeight:(CDVInvokedUrlCommand*)command
+{
+	CDVPluginResult* pluginResult = nil;
+	CGFloat navigationBarHeight = 0;
+	pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsInt:navigationBarHeight];
+
 	[self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
