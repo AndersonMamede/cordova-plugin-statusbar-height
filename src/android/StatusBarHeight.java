@@ -51,7 +51,7 @@ public class StatusBarHeight extends CordovaPlugin {
       this.getResourceDim(callbackContext, "navigation_bar_height");
     }
 
-    private void getResourceDim(CallbackContext callbackContext, string resouceName) {
+    private void getResourceDim(CallbackContext callbackContext, String resouceName) {
       Context contextApplication = cordova.getActivity().getApplicationContext();
       Resources resources = contextApplication.getResources();
 
