@@ -1,13 +1,20 @@
 package org.apache.cordova.statusbarheight;
 
-import org.apache.cordova.CordovaPlugin;
-import org.apache.cordova.CallbackContext;
+import android.content.Context;
+import android.content.res.Resources;
+import android.os.Build;
+import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.KeyCharacterMap;
+import android.view.KeyEvent;
+import android.view.ViewConfiguration;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import org.apache.cordova.CallbackContext;
+import org.apache.cordova.CordovaPlugin;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
-import android.content.res.Resources;
-import android.content.Context;
 
 /**
  * This class echoes a string called from JavaScript.
@@ -23,13 +30,13 @@ public class StatusBarHeight extends CordovaPlugin {
         }
 
         if (action.equals("getStatusBarHeight")) {
-          this.getStatusBarHeight(callbackContext);
-          return true;
+            this.getStatusBarHeight(callbackContext);
+            return true;
         }
 
         if (action.equals("getNavigationBarHeight")) {
-          this.getNavigationBarHeight(callbackContext);
-          return true;
+            this.getNavigationBarHeight(callbackContext);
+            return true;
         }
 
         return false;
@@ -44,26 +51,53 @@ public class StatusBarHeight extends CordovaPlugin {
     }
 
     private void getStatusBarHeight(CallbackContext callbackContext) {
-      this.getResourceDim(callbackContext, "status_bar_height");
+        this.getResourceDim(callbackContext, "status_bar_height");
     }
 
     private void getNavigationBarHeight(CallbackContext callbackContext) {
-      this.getResourceDim(callbackContext, "navigation_bar_height");
+        if (!this.hasSoftKeys()) {
+            callbackContext.success(0);
+        }
+        this.getResourceDim(callbackContext, "navigation_bar_height");
     }
 
-    private void getResourceDim(CallbackContext callbackContext, String resouceName) {
-      Context contextApplication = cordova.getActivity().getApplicationContext();
-      Resources resources = contextApplication.getResources();
+    private void getResourceDim(CallbackContext callbackContext, String resourceName) {
+        Context contextApplication = cordova.getActivity().getApplicationContext();
+        Resources resources = contextApplication.getResources();
 
-      int resourceId = resources.getIdentifier(resouceName, "dimen", "android");
-      if (resourceId > 0) {
-        int value = resources.getDimensionPixelSize(resourceId);
-        int result = (int) (value / Resources.getSystem().getDisplayMetrics().density);
-        callbackContext.success(result);
-      } else {
-        callbackContext.error("error");
-      }
+        int resourceId = resources.getIdentifier(resourceName, "dimen", "android");
+        if (resourceId > 0) {
+            int value = resources.getDimensionPixelSize(resourceId);
+            int result = (int) (value / Resources.getSystem().getDisplayMetrics().density);
+            callbackContext.success(result);
+        } else {
+            callbackContext.error("error");
+        }
+    }
+
+    private boolean hasSoftKeys() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            AppCompatActivity ac = cordova.getActivity();
+            Display d = ac.getWindowManager().getDefaultDisplay();
+
+            DisplayMetrics realDisplayMetrics = new DisplayMetrics();
+            d.getRealMetrics(realDisplayMetrics);
+
+            int realHeight = realDisplayMetrics.heightPixels;
+            int realWidth = realDisplayMetrics.widthPixels;
+
+            DisplayMetrics displayMetrics = new DisplayMetrics();
+            d.getMetrics(displayMetrics);
+
+            int displayHeight = displayMetrics.heightPixels;
+            int displayWidth = displayMetrics.widthPixels;
+
+            return  (realWidth - displayWidth) > 0 || (realHeight - displayHeight) > 0;
+        }
+
+        Context c = cordova.getActivity().getApplicationContext();
+        boolean hasMenuKey = ViewConfiguration.get(c).hasPermanentMenuKey();
+        boolean hasBackKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK);
+        return !hasMenuKey && !hasBackKey;
     }
 }
-
-
